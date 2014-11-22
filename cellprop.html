@@ -1,0 +1,111 @@
+<style>
+canvas {
+	border-style: solid;
+    border-width: 5px;
+}
+</style>
+
+<canvas id="canvas" width="1000" height="510">
+
+</canvas>
+
+<script>
+setInterval(Update, 50);
+
+var board = [];
+for (i = 0; i < 100; i++) {
+	board[i] = [];
+}
+var newboard = [];
+board[30][40] = 'b';
+board[20][40] = 'b';
+board[90][40] = 'b';
+
+var canvas = document.getElementById("canvas");
+var context = canvas.getContext("2d");
+context.fillStyle = "#000000";
+
+
+function Update() {
+	newboard = [];
+	for (i = 0; i < 100; i++) {
+		newboard[i] = [];
+	}
+
+	for (x = 0; x < board.length; x++) {
+		for (y = 0; y < board[x].length; y++) {
+			if (board[x][y] == 'g') {
+				if (Math.random() < 0.7) {
+					newboard[x][y] = 'g';
+				} else {
+					if (Math.random() > 0.95) {
+						newboard[x][y] = 'b';
+					}
+					var spawn = Math.random();
+					if (spawn > 0.30 && spawn < 0.70) {
+						newboard[x][y] = '';
+						if (availableCell(x, y - 1)) {
+							newboard[x][y - 1] = 'g';
+						}
+					}
+					if (spawn < 0.66) {
+						if (availableCell(x - 1, y - 1)) {
+							newboard[x - 1][y - 1] = 'g';
+						}
+					} 
+					if (spawn > 0.66) {
+						if (availableCell(x + 1, y - 1)) {
+							newboard[x + 1][y - 1] = 'g';
+						}
+					}
+				}
+				
+				
+			}	
+			
+			//drop
+			if (board[x][y] == 'b') {
+				if (y >= 50) {
+					newboard[x][y] = 'g';
+				} else {
+					newboard[x][y + 1] = 'b';
+				}
+			}
+		}
+	}
+
+	board = newboard;
+
+	Draw();
+}
+
+function Draw() {
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	for (x = 0; x < board.length; x++) {
+		for (y = 0; y < board[x].length; y++) {
+			if (board[x][y] == 'b') {
+				context.fillStyle = "#22BBFF";
+			} else if (board[x][y] == 'g') {
+				context.fillStyle = "#22FFBB";
+			}
+			
+			
+			if (board[x][y]) {
+				context.fillRect(x * 10, y * 10, 10, 10);
+			}
+		}
+	}
+}
+
+function validCell(x, y) {
+	return x >= 0 && y >= 0 && x < 100 && y <= 49;
+}
+
+function availableCell(x, y) {
+	try {
+		return validCell(x, y) && newboard[x][y] != 'b';
+	} catch(err) {
+		console.log(x + "," + y);
+	}
+}
+</script>
